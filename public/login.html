@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IRISBANK  Connexion</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo">IB</div>
+        <div>
+          <div>IRISBANK</div>
+          <div class="small">Espace client</div>
+        </div>
+      </div>
+      <div class="badge">Secure  Session</div>
+    </div>
+
+    <div class="grid" style="margin-top:22px">
+      <div class="card">
+        <div class="hd">
+          <h2>Connexion</h2>
+          <p>Connecte-toi pour accéder à ton dashboard bancaire.</p>
+        </div>
+        <div class="bd">
+          <form id="loginForm" class="row">
+            <div>
+              <label for="email">Email</label>
+              <input class="input" type="email" id="email" placeholder="ex: rajo@gmail.com" required />
+            </div>
+            <div>
+              <label for="password">Mot de passe</label>
+              <input class="input" type="password" id="password" placeholder="" required />
+            </div>
+            <button class="btn" type="submit">Se connecter</button>
+          </form>
+
+          <div id="message" class="msg"></div>
+
+          <div class="small" style="margin-top:14px">
+            Astuce : si tu es bloqué, reset dev possible (à retirer pour le rendu).
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  const msg = document.getElementById("message");
+  msg.className = "msg";
+  msg.textContent = "Connexion...";
+
+  const response = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await response.json();
+
+  if (response.ok && data.message) {
+    msg.className = "msg ok";
+    msg.textContent = "Connexion OK ";
+    window.location.href = "/dashboard.html";
+  } else {
+    msg.className = "msg err";
+    msg.textContent = data.error || "Erreur";
+  }
+});
+</script>
+</body>
+</html>
