@@ -1,98 +1,137 @@
 ﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>IRISBANK  Dashboard</title>
-  <link rel="stylesheet" href="/styles.css" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>IRISBANK Dashboard</title>
+<link rel="stylesheet" href="/styles.css"/>
 </head>
+
 <body>
-  <div class="container">
-    <div class="nav">
-      <div class="brand">
-        <div class="logo">IB</div>
-        <div>
-          <div>IRISBANK</div>
-          <div class="small">Dashboard client</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:center">
-        <span id="who" class="pill"><span class="dot"></span><span>Connecté</span></span>
-        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
-      </div>
-    </div>
 
-    <div class="grid grid-2">
-      <div class="card">
-        <div class="hd">
-          <h2>Mes comptes</h2>
-          <p>Vue rapide de tes comptes bancaires et soldes.</p>
-        </div>
-        <div class="bd">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>IBAN</th>
-                <th>Type</th>
-                <th>Solde</th>
-                <th>Statut</th>
-              </tr>
-            </thead>
-            <tbody id="accountsTbody"></tbody>
-          </table>
-          <div id="msgAccounts" class="msg"></div>
-        </div>
-      </div>
+<div class="container">
 
-      <div class="grid" style="margin-top:0">
-        <div class="card">
-          <div class="hd">
-            <h2>Créer un compte</h2>
-            <p>Compte courant, Livret A ou PEL.</p>
-          </div>
-          <div class="bd row">
-            <div>
-              <label>Type de compte</label>
-              <select id="newType">
-                <option value="COURANT">COURANT</option>
-                <option value="LIVRET_A">LIVRET_A</option>
-                <option value="PEL">PEL</option>
-              </select>
-            </div>
-            <button id="createBtn" class="btn btn-green">Créer</button>
-            <div id="msgCreate" class="msg"></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="hd">
-            <h2>Opérations</h2>
-            <p>Dépôt / retrait sur un compte.</p>
-          </div>
-          <div class="bd row">
-            <div>
-              <label>Compte (ID)</label>
-              <input class="input" id="opAccountId" placeholder="ex: 1" />
-            </div>
-            <div class="row row-2">
-              <div>
-                <label>Montant</label>
-                <input class="input" id="opAmount" placeholder="ex: 50" />
-              </div>
-              <div>
-                <label>&nbsp;</label>
-                <button id="depositBtn" class="btn">Dépôt</button>
-              </div>
-            </div>
-
-            <button id="withdrawBtn" class="btn btn-danger">Retrait</button>
-            <div id="msgOp" class="msg"></div>
-          </div>
-        </div>
-      </div>
+<div class="nav">
+  <div class="brand">
+    <div class="logo">IB</div>
+    <div>
+      <div>IRISBANK</div>
+      <div class="small">Dashboard client</div>
     </div>
   </div>
+
+  <div style="display:flex;gap:10px;align-items:center">
+    <span id="who" class="pill"><span class="dot"></span><span>Connecté</span></span>
+    <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+  </div>
+</div>
+
+
+<div class="grid grid-2">
+
+  <!-- comptes -->
+  <div class="card">
+    <div class="hd">
+      <h2>Mes comptes</h2>
+      <p>Vue rapide de tes comptes bancaires</p>
+    </div>
+
+    <div class="bd">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>IBAN</th>
+            <th>Type</th>
+            <th>Solde</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody id="accountsTbody"></tbody>
+      </table>
+
+      <div id="msgAccounts" class="msg"></div>
+    </div>
+  </div>
+
+
+  <!-- opérations -->
+  <div class="grid">
+
+    <div class="card">
+      <div class="hd">
+        <h2>Créer un compte</h2>
+      </div>
+
+      <div class="bd">
+        <select id="newType">
+          <option value="COURANT">COURANT</option>
+          <option value="LIVRET_A">LIVRET_A</option>
+          <option value="PEL">PEL</option>
+        </select>
+
+        <button id="createBtn" class="btn btn-green">Créer</button>
+
+        <div id="msgCreate" class="msg"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd">
+        <h2>Opérations</h2>
+      </div>
+
+      <div class="bd">
+        <input class="input" id="opAccountId" placeholder="Compte ID"/>
+        <input class="input" id="opAmount" placeholder="Montant"/>
+
+        <button id="depositBtn" class="btn">Dépôt</button>
+        <button id="withdrawBtn" class="btn btn-danger">Retrait</button>
+
+        <div id="msgOp" class="msg"></div>
+      </div>
+    </div>
+
+    <!-- VIREMENT -->
+    <div class="card">
+      <div class="hd">
+        <h2>Virement</h2>
+        <p class="small">Depuis un compte vers un IBAN</p>
+      </div>
+
+      <div class="bd">
+        <input class="input" id="transferFrom" placeholder="Compte source ID"/>
+        <input class="input" id="transferIban" placeholder="IBAN destination"/>
+        <input class="input" id="transferAmount" placeholder="Montant"/>
+
+        <button id="transferBtn" class="btn btn-green">Faire le virement</button>
+
+        <div id="msgTransfer" class="msg"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- historique -->
+<div class="card">
+  <div class="hd">
+    <h2>Historique des transactions</h2>
+    <p class="small">Clique sur un compte pour afficher l’historique</p>
+  </div>
+
+  <div class="bd">
+    <ul id="transactions">
+      <li class="small">Aucun compte sélectionné.</li>
+    </ul>
+    <div id="msgHistory" class="msg"></div>
+  </div>
+</div>
+
+</div>
+
+
 
 <script>
 async function api(url, method, body) {
@@ -101,44 +140,44 @@ async function api(url, method, body) {
     headers: { "Content-Type": "application/json" },
     body: body ? JSON.stringify(body) : undefined
   });
+
   const data = await res.json().catch(() => ({}));
   return { res, data };
 }
 
-function setMsg(el, ok, text){
+function setMsg(el, ok, text) {
   el.className = "msg " + (ok ? "ok" : "err");
   el.textContent = text;
 }
 
-async function loadMe(){
-  const {res, data} = await api("/api/auth/me", "GET");
+async function loadMe() {
+  const { res, data } = await api("/api/auth/me", "GET");
   const who = document.getElementById("who");
-  if(res.ok && data.user){
+
+  if (res.ok && data.user) {
     who.innerHTML = '<span class="dot"></span><span>' + data.user.prenom + ' ' + data.user.nom + '</span>';
   } else {
-    who.innerHTML = '<span class="dot red"></span><span>Non connecté</span>';
-    // redirige si pas connecté
     window.location.href = "/login.html";
   }
 }
 
-async function loadAccounts(){
+async function loadAccounts() {
   const tbody = document.getElementById("accountsTbody");
   const msg = document.getElementById("msgAccounts");
   tbody.innerHTML = "";
   msg.textContent = "";
 
-  const {res, data} = await api("/api/accounts", "GET");
-  if(!res.ok){
+  const { res, data } = await api("/api/accounts", "GET");
+  if (!res.ok) {
     msg.className = "msg err";
     msg.textContent = data.error || "Erreur";
     return;
   }
 
   const comptes = data.comptes || [];
-  if(comptes.length === 0){
+  if (comptes.length === 0) {
     msg.className = "msg";
-    msg.textContent = "Aucun compte. Crée-en un à droite ";
+    msg.textContent = "Aucun compte. Crée-en un à droite.";
     return;
   }
 
@@ -146,34 +185,61 @@ async function loadAccounts(){
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${c.id}</td>
-      <td><span class="small">${c.iban}</span></td>
+      <td>${c.iban}</td>
       <td>${c.type}</td>
-      <td><b>${Number(c.solde).toFixed(2)} €</b></td>
-      <td>
-        <span class="pill">
-          <span class="dot ${c.statut === "BLOQUE" ? "red" : ""}"></span>
-          <span>${c.statut}</span>
-        </span>
-      </td>
+      <td>${Number(c.solde).toFixed(2)}€</td>
+      <td>${c.statut}</td>
     `;
+
     tr.style.cursor = "pointer";
     tr.addEventListener("click", () => {
       document.getElementById("opAccountId").value = c.id;
+      document.getElementById("transferFrom").value = c.id; // UX: set source
+      loadTransactions(c.id);
     });
+
     tbody.appendChild(tr);
+  });
+}
+
+async function loadTransactions(accountId) {
+  const list = document.getElementById("transactions");
+  const msg = document.getElementById("msgHistory");
+
+  msg.textContent = "";
+  list.innerHTML = "<li class='small'>Chargement...</li>";
+
+  const { res, data } = await api("/api/transactions/history/" + accountId, "GET");
+
+  if (!res.ok) {
+    list.innerHTML = "";
+    setMsg(msg, false, data.error || "Erreur lors du chargement de l'historique");
+    return;
+  }
+
+  const txs = data.transactions || [];
+
+  if (txs.length === 0) {
+    list.innerHTML = "<li class='small'>Aucune transaction pour ce compte.</li>";
+    return;
+  }
+
+  list.innerHTML = "";
+  txs.forEach(t => {
+    const li = document.createElement("li");
+    li.textContent = t.type + " | " + t.montant + "€ | " + new Date(t.created_at).toLocaleString();
+    list.appendChild(li);
   });
 }
 
 document.getElementById("createBtn").addEventListener("click", async () => {
   const type = document.getElementById("newType").value;
   const msg = document.getElementById("msgCreate");
-  msg.className = "msg";
-  msg.textContent = "Création...";
 
-  const {res, data} = await api("/api/accounts", "POST", { type });
-  if(res.ok){
-    setMsg(msg, true, "Compte créé ");
-    await loadAccounts();
+  const { res, data } = await api("/api/accounts", "POST", { type });
+  if (res.ok) {
+    setMsg(msg, true, "Compte créé");
+    loadAccounts();
   } else {
     setMsg(msg, false, data.error || "Erreur");
   }
@@ -183,13 +249,12 @@ document.getElementById("depositBtn").addEventListener("click", async () => {
   const accountId = Number(document.getElementById("opAccountId").value);
   const amount = Number(document.getElementById("opAmount").value);
   const msg = document.getElementById("msgOp");
-  msg.className = "msg";
-  msg.textContent = "Traitement...";
 
-  const {res, data} = await api("/api/transactions/deposit", "POST", { accountId, amount });
-  if(res.ok){
-    setMsg(msg, true, "Dépôt OK ");
-    await loadAccounts();
+  const { res, data } = await api("/api/transactions/deposit", "POST", { accountId, amount });
+  if (res.ok) {
+    setMsg(msg, true, "Dépôt OK");
+    loadAccounts();
+    loadTransactions(accountId);
   } else {
     setMsg(msg, false, data.error || "Erreur");
   }
@@ -199,13 +264,42 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
   const accountId = Number(document.getElementById("opAccountId").value);
   const amount = Number(document.getElementById("opAmount").value);
   const msg = document.getElementById("msgOp");
+
+  const { res, data } = await api("/api/transactions/withdraw", "POST", { accountId, amount });
+  if (res.ok) {
+    setMsg(msg, true, "Retrait OK");
+    loadAccounts();
+    loadTransactions(accountId);
+  } else {
+    setMsg(msg, false, data.error || "Erreur");
+  }
+});
+
+/* VIREMENT */
+document.getElementById("transferBtn").addEventListener("click", async () => {
+  const fromAccountId = Number(document.getElementById("transferFrom").value);
+  const toIban = document.getElementById("transferIban").value.trim();
+  const amount = Number(document.getElementById("transferAmount").value);
+  const msg = document.getElementById("msgTransfer");
+
+  if (!fromAccountId || !toIban || !amount) {
+    setMsg(msg, false, "Remplis tous les champs du virement");
+    return;
+  }
+
   msg.className = "msg";
   msg.textContent = "Traitement...";
 
-  const {res, data} = await api("/api/transactions/withdraw", "POST", { accountId, amount });
-  if(res.ok){
-    setMsg(msg, true, "Retrait OK ");
-    await loadAccounts();
+  const { res, data } = await api("/api/transactions/transfer", "POST", {
+    fromAccountId,
+    toIban,
+    amount
+  });
+
+  if (res.ok) {
+    setMsg(msg, true, "Virement effectué");
+    loadAccounts();
+    loadTransactions(fromAccountId);
   } else {
     setMsg(msg, false, data.error || "Erreur");
   }
@@ -219,5 +313,6 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
 loadMe();
 loadAccounts();
 </script>
+
 </body>
 </html>

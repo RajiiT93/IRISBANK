@@ -31,6 +31,10 @@ exports.withdraw = async (req, res) => {
       [accountId]
     );
 
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ error: "Compte introuvable" });
+    }
+
     if (rows[0].solde < amount) {
       return res.status(400).json({ error: "Solde insuffisant" });
     }
@@ -60,6 +64,10 @@ exports.transfer = async (req, res) => {
       "SELECT solde FROM comptes_bancaires WHERE id = ?",
       [fromAccountId]
     );
+
+    if (!source || source.length === 0) {
+      return res.status(404).json({ error: "Compte source introuvable" });
+    }
 
     if (source[0].solde < amount) {
       return res.status(400).json({ error: "Solde insuffisant" });
@@ -99,16 +107,20 @@ exports.transfer = async (req, res) => {
 
 // historique
 exports.history = async (req, res) => {
-  const accountId = req.params.accountId;
+  const accountId = Number(req.params.accountId);
 
   try {
     const [rows] = await db.query(
-      "SELECT * FROM transactions WHERE compte_source_id = ? OR compte_destination_id = ? ORDER BY created_at DESC",
+      `SELECT id, type, montant, compte_source_id, compte_destination_id, created_at
+       FROM transactions
+       WHERE compte_source_id = ? OR compte_destination_id = ?
+       ORDER BY created_at DESC`,
       [accountId, accountId]
     );
 
-    res.json(rows);
+    // IMPORTANT: on renvoie la clé attendue par le front
+    return res.json({ transactions: rows });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 };
