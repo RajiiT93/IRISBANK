@@ -16,12 +16,7 @@ const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
-// rate limit login
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5
-});
-
+// middlewares
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,35 +27,54 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET || "irisbanksecret",
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true
+    }
   })
 );
 
-// CSRF avec cookie
+// rate limit login
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: "Trop de tentatives de connexion" }
+});
+
+// CSRF protection
 const csrfProtection = csrf({
   cookie: true
 });
 
-// route token
+// route pour récupérer le token CSRF
 app.get("/api/csrf-token", csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
-// routes
-app.use("/api/auth/login", loginLimiter);
-app.use("/api/auth", csrfProtection, authRoutes);
+// ROUTES AUTH
+app.use("/api/auth/login", loginLimiter); // limiter login
+app.use("/api/auth", authRoutes); // auth sans csrf obligatoire
+
+// ROUTES PROTÉGÉES
 app.use("/api/accounts", csrfProtection, accountRoutes);
 app.use("/api/transactions", csrfProtection, transactionRoutes);
 app.use("/api/admin", csrfProtection, adminRoutes);
 
-// erreur CSRF
+// gestion erreur CSRF
 app.use((err, req, res, next) => {
   if (err.code === "EBADCSRFTOKEN") {
-    return res.status(403).json({ error: "Token CSRF invalide ou manquant" });
+    return res.status(403).json({
+      error: "Token CSRF invalide ou manquant"
+    });
   }
-  next(err);
+
+  console.error(err);
+  res.status(500).json({
+    error: "Erreur serveur"
+  });
 });
 
+// lancement serveur
 app.listen(3000, () => {
-  console.log("Server running on port 3000");
+  console.log("🚀 IRISBANK server running on port 3000");
 });

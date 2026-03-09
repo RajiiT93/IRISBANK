@@ -106,6 +106,12 @@ exports.toggleAccountStatus = async (req, res) => {
       [newStatus, req.params.id]
     );
 
+    // notification admin
+    await db.query(
+      "INSERT INTO notifications (message, type) VALUES (?, ?)",
+      [`Compte #${req.params.id} passé en statut ${newStatus}`, "ACCOUNT_STATUS"]
+    );
+
     res.json({ message: "Statut modifié", statut: newStatus });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -159,6 +165,20 @@ exports.getAllTransactions = async (req, res) => {
     `);
 
     res.json(transactions);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// NOTIFICATIONS
+
+exports.getNotifications = async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      "SELECT * FROM notifications ORDER BY created_at DESC LIMIT 10"
+    );
+
+    res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

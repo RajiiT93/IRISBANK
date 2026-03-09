@@ -235,31 +235,6 @@
       box-shadow:0 0 0 4px rgba(96,165,250,0.15);
     }
 
-    .actions{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      margin-top:4px;
-      margin-bottom:2px;
-    }
-
-    .remember{
-      font-size:14px;
-      color:var(--muted);
-    }
-
-    .forgot{
-      font-size:14px;
-      color:var(--primary);
-      text-decoration:none;
-      font-weight:600;
-    }
-
-    .forgot:hover{
-      text-decoration:underline;
-    }
-
     .btn{
       width:100%;
       border:none;
@@ -276,7 +251,6 @@
 
     .btn:hover{
       background:var(--primary-dark);
-      transform:translateY(-1px);
     }
 
     .msg{
@@ -305,182 +279,152 @@
       background:#dbeafe;
       color:#1d4ed8;
     }
-
-    .footer-note{
-      margin-top:18px;
-      font-size:13px;
-      color:var(--muted);
-      text-align:center;
-      line-height:1.5;
-    }
-
-    @media (max-width: 950px){
-      .page{
-        grid-template-columns:1fr;
-      }
-
-      .left{
-        min-height:320px;
-      }
-
-      .hero h1{
-        font-size:34px;
-      }
-    }
-
-    @media (max-width: 520px){
-      body{
-        padding:12px;
-      }
-
-      .left,
-      .right{
-        padding:24px;
-      }
-
-      .login-card h2{
-        font-size:28px;
-      }
-
-      .topline{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:12px;
-      }
-
-      .actions{
-        flex-direction:column;
-        align-items:flex-start;
-      }
-    }
   </style>
 </head>
+
 <body>
-  <div class="page">
-    <section class="left">
-      <div>
-        <div class="brand">
-          <div class="logo">IB</div>
-          <div>
-            <div class="brand-title">IRISBANK</div>
-            <div class="brand-sub">Espace client sécurisé</div>
-          </div>
-        </div>
 
-        <div class="hero">
-          <h1>Bienvenue sur votre espace bancaire</h1>
-          <p>
-            Consultez vos comptes, effectuez vos opérations et gérez vos virements
-            depuis une interface moderne, claire et sécurisée.
-          </p>
+<div class="page">
 
-          <div class="features">
-            <div class="feature">
-              <div class="feature-title">Gestion rapide des comptes</div>
-              <div class="feature-text">Visualisez vos soldes, créez de nouveaux comptes et suivez vos opérations en temps réel.</div>
-            </div>
-
-            <div class="feature">
-              <div class="feature-title">Virements simplifiés</div>
-              <div class="feature-text">Envoyez de l’argent rapidement avec un suivi clair de l’historique de vos transactions.</div>
-            </div>
-
-            <div class="feature">
-              <div class="feature-title">Accès sécurisé</div>
-              <div class="feature-text">Connexion protégée par session utilisateur pour garder vos données bancaires privées.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="secure-badge">
-        <span class="dot"></span>
-        <span>Session sécurisée</span>
-      </div>
-    </section>
-
-    <section class="right">
-      <div class="login-card">
-        <div class="topline">
-          <div>
-            <h2>Connexion</h2>
-            <p class="subtitle">Connecte-toi pour accéder à ton dashboard bancaire.</p>
-          </div>
-          <div class="mini-badge">Client</div>
-        </div>
-
-        <form id="loginForm" class="form">
-          <div class="field">
-            <label for="email">Email</label>
-            <input class="input" type="email" id="email" placeholder="ex: rajo@gmail.com" required />
-          </div>
-
-          <div class="field">
-            <label for="password">Mot de passe</label>
-            <input class="input" type="password" id="password" placeholder="Entre ton mot de passe" required />
-          </div>
-
-          <div class="actions">
-            <div class="remember">Accès réservé aux utilisateurs enregistrés</div>
-          </div>
-
-          <button class="btn" type="submit">Se connecter</button>
-        </form>
-
-        <div id="message" class="msg"></div>
-        
-<div class="small" style="margin-top:15px">
-Pas encore de compte ?
-<a href="/register.html">Créer un compte</a>
+<section class="left">
+<div>
+<div class="brand">
+<div class="logo">IB</div>
+<div>
+<div class="brand-title">IRISBANK</div>
+<div class="brand-sub">Espace client sécurisé</div>
 </div>
-        <div class="footer-note">
-          Astuce : si tu es bloqué pendant les tests, pense à retirer les outils de dev avant le rendu final.
-        </div>
-      </div>
-    </section>
-  </div>
+</div>
+
+<div class="hero">
+<h1>Bienvenue sur votre espace bancaire</h1>
+<p>Consultez vos comptes et effectuez vos opérations en toute sécurité.</p>
+</div>
+</div>
+
+<div class="secure-badge">
+<span class="dot"></span>
+<span>Session sécurisée</span>
+</div>
+</section>
+
+<section class="right">
+
+<div class="login-card">
+
+<div class="topline">
+<div>
+<h2>Connexion</h2>
+<p class="subtitle">Connecte-toi pour accéder à ton dashboard bancaire.</p>
+</div>
+<div class="mini-badge">Client / Admin</div>
+</div>
+
+<form id="loginForm" class="form">
+
+<div class="field">
+<label>Email</label>
+<input class="input" type="email" id="email" required>
+</div>
+
+<div class="field">
+<label>Mot de passe</label>
+<input class="input" type="password" id="password" required>
+</div>
+
+<button class="btn" type="submit">Se connecter</button>
+
+</form>
+
+<div id="message" class="msg"></div>
+
+</div>
+
+</section>
+
+</div>
 
 <script>
-let csrfToken = "";
 
-async function loadCsrfToken() {
-  const res = await fetch("/api/csrf-token");
-  const data = await res.json();
-  csrfToken = data.csrfToken;
+let csrfToken="";
+
+async function loadCsrfToken(){
+
+const res=await fetch("/api/csrf-token");
+const data=await res.json();
+
+csrfToken=data.csrfToken;
+
 }
 
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
+document.getElementById("loginForm").addEventListener("submit",async(e)=>{
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
+e.preventDefault();
 
-  const msg = document.getElementById("message");
-  msg.className = "msg show info";
-  msg.textContent = "Connexion...";
+const email=document.getElementById("email").value.trim();
+const password=document.getElementById("password").value;
 
-  const response = await fetch("/api/auth/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "CSRF-Token": csrfToken
-    },
-    body: JSON.stringify({ email, password })
-  });
+const msg=document.getElementById("message");
 
-  const data = await response.json().catch(() => ({}));
+msg.className="msg show info";
+msg.textContent="Connexion...";
 
-  if (response.ok && data.message) {
-    msg.className = "msg show ok";
-    msg.textContent = "Connexion OK";
-    window.location.href = "/dashboard.html";
-  } else {
-    msg.className = "msg show err";
-    msg.textContent = data.error || "Erreur";
-  }
+try{
+
+const response=await fetch("/api/auth/login",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"CSRF-Token":csrfToken
+},
+body:JSON.stringify({email,password})
+});
+
+const data=await response.json();
+
+if(!response.ok){
+
+msg.className="msg show err";
+msg.textContent=data.error||"Erreur connexion";
+return;
+
+}
+
+msg.className="msg show ok";
+msg.textContent="Connexion réussie";
+
+const isAdmin =
+data?.is_admin===1 ||
+data?.is_admin===true ||
+data?.user?.is_admin===1 ||
+data?.user?.is_admin===true;
+
+setTimeout(()=>{
+
+if(isAdmin){
+
+window.location.href="/admin.html";
+
+}else{
+
+window.location.href="/dashboard.html";
+
+}
+
+},500);
+
+}catch(err){
+
+msg.className="msg show err";
+msg.textContent="Erreur serveur";
+
+}
+
 });
 
 loadCsrfToken();
+
 </script>
+
 </body>
 </html>

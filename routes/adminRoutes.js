@@ -17,7 +17,10 @@ router.patch("/accounts/:id/block", requireAuth, requireAdmin, adminController.t
 // Statistiques
 router.get("/stats", requireAuth, requireAdmin, adminController.getStats);
 
-// Transactions (NOUVEAU)
+// Transactions
 router.get("/transactions", requireAuth, requireAdmin, adminController.getAllTransactions);
+
+// Notifications
+router.get("/notifications", requireAuth, requireAdmin, adminController.getNotifications);
 
 module.exports = router;

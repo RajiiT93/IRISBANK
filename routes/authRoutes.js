@@ -4,7 +4,7 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
-// Register
+// REGISTER
 router.post(
   "/register",
   [
@@ -56,7 +56,7 @@ router.post(
   authController.register
 );
 
-// Login
+// LOGIN
 router.post(
   "/login",
   [
@@ -74,10 +74,10 @@ router.post(
   authController.login
 );
 
-// Me (session)
+// SESSION USER
 router.get("/me", authController.me);
 
-// Logout
+// LOGOUT
 router.post("/logout", authController.logout);
 
 module.exports = router;

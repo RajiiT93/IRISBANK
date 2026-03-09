@@ -76,6 +76,17 @@ exports.create = async (req, res) => {
   }
 
   try {
+    const [userRows] = await db.query(
+      "SELECT nom, prenom FROM users WHERE id = ? LIMIT 1",
+      [userId]
+    );
+
+    if (userRows.length === 0) {
+      return res.status(404).json({ error: "Utilisateur introuvable" });
+    }
+
+    const user = userRows[0];
+
     const [existingAccounts] = await db.query(
       "SELECT COUNT(*) AS total FROM comptes_bancaires WHERE user_id = ?",
       [userId]
@@ -119,6 +130,11 @@ exports.create = async (req, res) => {
       [result.insertId]
     );
 
+    await db.query(
+      "INSERT INTO notifications (message, type) VALUES (?, ?)",
+      [`Nouveau compte ${type} créé pour ${user.prenom} ${user.nom} (${iban})`, "NEW_ACCOUNT"]
+    );
+
     res.status(201).json({ message: "Compte créé", compte: rows[0] });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -139,8 +155,19 @@ exports.remove = async (req, res) => {
       return res.status(400).json({ error: "ID de compte invalide" });
     }
 
+    const [userRows] = await db.query(
+      "SELECT nom, prenom FROM users WHERE id = ? LIMIT 1",
+      [userId]
+    );
+
+    if (userRows.length === 0) {
+      return res.status(404).json({ error: "Utilisateur introuvable" });
+    }
+
+    const user = userRows[0];
+
     const [rows] = await db.query(
-      `SELECT id, solde, statut
+      `SELECT id, iban, solde, statut
        FROM comptes_bancaires
        WHERE id = ? AND user_id = ?`,
       [accountId, userId]
@@ -158,9 +185,16 @@ exports.remove = async (req, res) => {
       return res.status(400).json({ error: "Impossible de supprimer : solde non nul" });
     }
 
+    const iban = rows[0].iban;
+
     await db.query(
       `DELETE FROM comptes_bancaires WHERE id = ? AND user_id = ?`,
       [accountId, userId]
+    );
+
+    await db.query(
+      "INSERT INTO notifications (message, type) VALUES (?, ?)",
+      [`Compte supprimé par ${user.prenom} ${user.nom} (${iban})`, "DELETE_ACCOUNT"]
     );
 
     res.json({ message: "Compte supprimé" });
