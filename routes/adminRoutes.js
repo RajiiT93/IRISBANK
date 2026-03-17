@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const db = require("../config/db");
 
 const adminController = require("../controllers/adminController");
 const { requireAuth, requireAdmin } = require("../middleware/authMiddleware");
@@ -22,5 +23,36 @@ router.get("/transactions", requireAuth, requireAdmin, adminController.getAllTra
 
 // Notifications
 router.get("/notifications", requireAuth, requireAdmin, adminController.getNotifications);
+
+/* ROUTE RESET */
+
+router.delete("/reset", requireAuth, requireAdmin, async (req, res) => {
+
+  try {
+
+    await db.query("SET FOREIGN_KEY_CHECKS = 0");
+
+    await db.query("DELETE FROM transactions");
+    await db.query("DELETE FROM comptes_bancaires");
+    await db.query("DELETE FROM notifications");
+    await db.query("DELETE FROM users WHERE is_admin = 0");
+
+    await db.query("SET FOREIGN_KEY_CHECKS = 1");
+
+    res.json({
+      message: "Base réinitialisée"
+    });
+
+  } catch (err) {
+
+    console.error("RESET ERROR:", err);
+
+    res.status(500).json({
+      error: "Erreur reset"
+    });
+
+  }
+
+});
 
 module.exports = router;

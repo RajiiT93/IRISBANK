@@ -420,7 +420,20 @@ width:min(92vw,360px);
 
 <div class="top-actions">
 <button class="refresh-btn" onclick="refreshAll()">⟳ Actualiser</button>
-
+<button onclick="resetBank()" style="
+background:#dc2626;
+color:white;
+border:none;
+padding:10px 14px;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+">
+Reset Bank
+</button>
+<button onclick="logout()" style="background:#ef4444;border:none;padding:10px 14px;border-radius:10px;color:white;font-weight:600;cursor:pointer;">
+Logout
+</button>
 <div class="notification-wrapper">
 <button class="notification-bell" onclick="toggleNotificationPanel()">
 🔔
@@ -831,6 +844,35 @@ function renderTransactionsPreview(items){
   document.getElementById("transactionsPreview").innerHTML = html || `<div class="empty-state">Aucune transaction récente</div>`;
 }
 
+async function logout(){
+  await api("/api/auth/logout","POST",{});
+  window.location.href = "/login.html";
+}
+
+async function resetBank(){
+
+  const confirmReset = confirm("Supprimer toutes les données ?");
+  if(!confirmReset) return;
+
+  // recharge le token CSRF
+  await loadCsrfToken();
+
+  const {res,data} = await api("/api/admin/reset","DELETE");
+
+  if(res.ok){
+
+    alert("Base réinitialisée");
+    refreshAll();
+
+  }else{
+
+    alert(data.error || "Erreur reset");
+
+  }
+
+}
+
+
 async function refreshAll(){
   await loadCsrfToken();
   await loadStats();
@@ -846,6 +888,12 @@ async function refreshAll(){
 
   await refreshAll();
 })();
+
+
+
+
+
+
 </script>
 
 </body>

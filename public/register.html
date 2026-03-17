@@ -1,118 +1,222 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>IRISBANK - Inscription</title>
-<link rel="stylesheet" href="/styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRISBANK | Inscription</title>
+
+<style>
+
+:root{
+--bg:#f4f7fb;
+--panel:#ffffff;
+--text:#1f2937;
+--muted:#6b7280;
+--primary:#2563eb;
+--primary-dark:#1d4ed8;
+--shadow:0 10px 30px rgba(15,23,42,0.08);
+}
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+min-height:100vh;
+background:var(--bg);
+display:flex;
+align-items:center;
+justify-content:center;
+padding:24px;
+}
+
+.page{
+width:100%;
+max-width:1150px;
+display:grid;
+grid-template-columns:1.1fr 0.9fr;
+background:white;
+border-radius:28px;
+overflow:hidden;
+box-shadow:var(--shadow);
+min-height:700px;
+}
+
+.left{
+background:linear-gradient(160deg,#1e293b 0%,#334155 55%,#2563eb 100%);
+color:white;
+padding:42px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+}
+
+.logo{
+font-size:22px;
+font-weight:bold;
+margin-bottom:20px;
+}
+
+.left h1{
+font-size:40px;
+margin-bottom:16px;
+}
+
+.left p{
+color:#dbeafe;
+font-size:16px;
+line-height:1.6;
+}
+
+.right{
+padding:40px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.card{
+width:100%;
+max-width:420px;
+}
+
+.card h2{
+font-size:30px;
+margin-bottom:10px;
+}
+
+.subtitle{
+color:var(--muted);
+margin-bottom:24px;
+}
+
+.form{
+display:grid;
+gap:14px;
+}
+
+.input{
+width:100%;
+border:1px solid #d1d5db;
+border-radius:14px;
+padding:12px;
+font-size:14px;
+}
+
+.btn{
+width:100%;
+border:none;
+border-radius:14px;
+padding:14px;
+font-size:15px;
+font-weight:bold;
+cursor:pointer;
+background:var(--primary);
+color:white;
+}
+
+.btn:hover{
+background:var(--primary-dark);
+}
+
+.link{
+text-align:center;
+margin-top:14px;
+font-size:14px;
+}
+
+.link a{
+color:var(--primary);
+text-decoration:none;
+font-weight:bold;
+}
+
+.msg{
+margin-top:14px;
+padding:10px;
+border-radius:12px;
+display:none;
+}
+
+.msg.show{
+display:block;
+}
+
+.msg.ok{
+background:#dcfce7;
+color:#166534;
+}
+
+.msg.err{
+background:#fee2e2;
+color:#991b1b;
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="page">
 
-<div class="nav">
-<div class="brand">
-<div class="logo">IB</div>
-<div>
-<div>IRISBANK</div>
-<div class="small">Créer un compte</div>
-</div>
-</div>
+<div class="left">
+
+<div class="logo">IRISBANK</div>
+
+<h1>Créer votre compte bancaire</h1>
+
+<p>
+Rejoignez IrisBank et accédez à votre espace bancaire sécurisé pour gérer vos comptes et vos opérations.
+</p>
+
 </div>
 
-<div class="grid" style="margin-top:22px">
+<div class="right">
 
 <div class="card">
 
-<div class="hd">
 <h2>Inscription</h2>
-<p>Créer un compte client</p>
-</div>
+<p class="subtitle">Créez votre compte client.</p>
 
-<div class="bd">
+<form id="registerForm" class="form">
 
-<form id="registerForm" class="row">
+<input class="input" id="nom" placeholder="Nom" required>
+<input class="input" id="prenom" placeholder="Prénom" required>
+<input class="input" id="email" type="email" placeholder="Email" required>
+<input class="input" id="telephone" placeholder="Téléphone" required>
+<input class="input" id="adresse" placeholder="Adresse" required>
+<input class="input" id="date_naissance" type="date" required>
+<input class="input" id="password" type="password" placeholder="Mot de passe" required>
 
-<div>
-<label>Nom</label>
-<input class="input" id="nom" required>
-</div>
-
-<div>
-<label>Prénom</label>
-<input class="input" id="prenom" required>
-</div>
-
-<div>
-<label>Email</label>
-<input class="input" type="email" id="email" required>
-</div>
-
-<div>
-<label>Téléphone</label>
-<input class="input" id="telephone" placeholder="0612345678" required>
-</div>
-
-<div>
-<label>Adresse</label>
-<input class="input" id="adresse" required>
-</div>
-
-<div>
-<label>Date de naissance</label>
-<input class="input" type="date" id="date_naissance" required>
-</div>
-
-<div>
-<label>Mot de passe</label>
-<input class="input" type="password" id="password" required>
-</div>
-
-<button class="btn btn-green" type="submit">Créer le compte</button>
+<button class="btn" type="submit">Créer mon compte</button>
 
 </form>
 
-<div id="msg" class="msg"></div>
-
-<div class="small" style="margin-top:15px">
-Déjà un compte ?
+<div class="link">
+Déjà inscrit ?
 <a href="/login.html">Se connecter</a>
 </div>
 
-</div>
+<div id="message" class="msg"></div>
+
 </div>
 
 </div>
+
 </div>
 
 <script>
 
-let csrfToken = ""
-
-async function loadCSRF(){
-
-const res = await fetch("/api/csrf-token",{
-credentials:"include"
-})
-
-const data = await res.json()
-
-csrfToken = data.csrfToken
-
-}
-
 document.getElementById("registerForm").addEventListener("submit", async (e)=>{
 
-e.preventDefault()
+e.preventDefault();
 
-const msg = document.getElementById("msg")
+const msg=document.getElementById("message");
 
-msg.className="msg"
-msg.innerText="Création du compte..."
-
-await loadCSRF()
-
-const data = {
+const body={
 nom:document.getElementById("nom").value,
 prenom:document.getElementById("prenom").value,
 email:document.getElementById("email").value,
@@ -120,41 +224,58 @@ telephone:document.getElementById("telephone").value,
 adresse:document.getElementById("adresse").value,
 date_naissance:document.getElementById("date_naissance").value,
 password:document.getElementById("password").value
-}
+};
 
+try{
+
+// inscription
 const res = await fetch("/api/auth/register",{
 method:"POST",
-credentials:"include",
 headers:{
-"Content-Type":"application/json",
-"CSRF-Token":csrfToken
+"Content-Type":"application/json"
 },
-body:JSON.stringify(data)
+credentials:"include",
+body:JSON.stringify(body)
+});
+
+const data = await res.json();
+
+if(!res.ok){
+msg.className="msg show err";
+msg.textContent=data.error || "Erreur inscription";
+return;
+}
+
+// login automatique
+const login = await fetch("/api/auth/login",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+credentials:"include",
+body:JSON.stringify({
+email:body.email,
+password:body.password
 })
+});
 
-const json = await res.json()
+if(!login.ok){
+window.location.href="/login.html";
+return;
+}
 
-if(res.ok){
+// dashboard
+window.location.href="/dashboard.html";
 
-msg.className="msg ok"
-msg.innerText="Compte créé ✔"
+}catch(err){
 
-setTimeout(()=>{
-window.location.href="/dashboard.html"
-},1000)
-
-}else{
-
-msg.className="msg err"
-msg.innerText=json.error || "Erreur inscription"
+msg.className="msg show err";
+msg.textContent="Erreur serveur";
 
 }
 
-})
-
-loadCSRF()
+});
 
 </script>
-
 </body>
 </html>

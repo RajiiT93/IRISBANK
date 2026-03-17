@@ -601,82 +601,134 @@ body{
 </div>
 
 <script>
+
 let selectedAccountId = null;
 let csrfToken = "";
 
-async function loadCsrfToken() {
-  const res = await fetch("/api/csrf-token");
+
+/* ===============================
+   CSRF
+================================ */
+
+async function loadCsrfToken(){
+
+  const res = await fetch("/api/csrf-token",{
+    credentials:"include"
+  });
+
   const data = await res.json();
+
   csrfToken = data.csrfToken;
+
 }
 
-async function api(url, method, body) {
-  const headers = { "Content-Type": "application/json" };
 
-  if (method !== "GET") {
+/* ===============================
+   API HELPER
+================================ */
+
+async function api(url, method="GET", body=null){
+
+  const headers = {};
+
+  if(method !== "GET"){
+    headers["Content-Type"] = "application/json";
     headers["CSRF-Token"] = csrfToken;
   }
 
-  const res = await fetch(url, {
+  const res = await fetch(url,{
     method,
     headers,
+    credentials:"include",
     body: body ? JSON.stringify(body) : undefined
   });
 
-  const data = await res.json().catch(() => ({}));
-  return { res, data };
+  const data = await res.json().catch(()=>({}));
+
+  return {res,data};
+
 }
 
-function setMsg(el, ok, text, mode = null) {
-  el.className = "msg show " + (mode ? mode : (ok ? "ok" : "err"));
+
+/* ===============================
+   MESSAGE UI
+================================ */
+
+function setMsg(el, ok, text, mode=null){
+  el.className = "msg show " + (mode ? mode : (ok ? "ok":"err"));
   el.textContent = text;
 }
 
-function clearMsg(el) {
+function clearMsg(el){
   el.className = "msg";
   el.textContent = "";
 }
 
-function updateSelectedAccountLabel(value) {
-  document.getElementById("selectedAccountLabel").textContent = value ? "#" + value : "Aucun";
-}
 
-async function loadMe() {
-  const { res, data } = await api("/api/auth/me", "GET");
+/* ===============================
+   SESSION CHECK
+================================ */
+
+async function loadMe(){
+
   const who = document.getElementById("who");
 
-  if (res.ok && data.user) {
-    who.innerHTML = '<span class="status-dot"></span><span>' + data.user.prenom + ' ' + data.user.nom + '</span>';
-  } else {
-    window.location.href = "/login.html";
+  try{
+
+    const res = await fetch("/api/auth/me",{
+      credentials:"include"
+    });
+
+    const data = await res.json();
+
+    if(res.ok && data.user){
+
+      who.innerHTML =
+      '<span class="status-dot"></span><span>' +
+      data.user.prenom + " " + data.user.nom +
+      '</span>';
+
+      return true;
+
+    }
+
+  }catch(e){
+    console.error(e);
   }
+
+  return false;
+
 }
 
-async function loadAccounts() {
-  const tbody = document.getElementById("accountsTbody");
-  const msg = document.getElementById("msgAccounts");
-  tbody.innerHTML = "";
-  clearMsg(msg);
 
-  const { res, data } = await api("/api/accounts", "GET");
-  if (!res.ok) {
-    setMsg(msg, false, data.error || "Erreur");
-    return;
-  }
+/* ===============================
+   ACCOUNTS
+================================ */
+
+async function loadAccounts(){
+
+  const tbody = document.getElementById("accountsTbody");
+
+  const {res,data} = await api("/api/accounts");
+
+  if(!res.ok) return;
 
   const comptes = data.comptes || [];
+
   document.getElementById("statsAccounts").textContent = comptes.length;
 
-  const totalBalance = comptes.reduce((sum, c) => sum + Number(c.solde || 0), 0);
-  document.getElementById("statsBalance").textContent = totalBalance.toFixed(2) + "€";
+  const totalBalance =
+    comptes.reduce((sum,c)=>sum + Number(c.solde || 0),0);
 
-  if (comptes.length === 0) {
-    setMsg(msg, true, "Aucun compte. Crée-en un à droite.", "info");
-    return;
-  }
+  document.getElementById("statsBalance").textContent =
+    totalBalance.toFixed(2) + "€";
 
-  comptes.forEach(c => {
+  tbody.innerHTML = "";
+
+  comptes.forEach(c=>{
+
     const tr = document.createElement("tr");
+
     tr.innerHTML = `
       <td>${c.id}</td>
       <td>${c.iban}</td>
@@ -685,141 +737,181 @@ async function loadAccounts() {
       <td>${c.statut}</td>
     `;
 
-    tr.addEventListener("click", () => {
+    tr.addEventListener("click",()=>{
+
       selectedAccountId = c.id;
+
       document.getElementById("opAccountId").value = c.id;
       document.getElementById("transferFrom").value = c.id;
+
       updateSelectedAccountLabel(c.id);
+
       loadTransactions(c.id);
 
-      document.querySelectorAll("#accountsTbody tr").forEach(row => {
-        row.style.background = "";
-      });
-      tr.style.background = "#eff6ff";
     });
 
     tbody.appendChild(tr);
+
   });
+
 }
 
-async function loadTransactions(accountId) {
+
+/* ===============================
+   TRANSACTIONS
+================================ */
+
+async function loadTransactions(accountId){
+
   const list = document.getElementById("transactions");
-  const msg = document.getElementById("msgHistory");
 
-  clearMsg(msg);
-  list.innerHTML = "<li class='small-muted'>Chargement...</li>";
+  const {res,data} =
+    await api("/api/transactions/history/" + accountId);
 
-  const { res, data } = await api("/api/transactions/history/" + accountId, "GET");
-
-  if (!res.ok) {
-    list.innerHTML = "";
-    setMsg(msg, false, data.error || "Erreur lors du chargement de l'historique");
-    return;
-  }
+  if(!res.ok) return;
 
   const txs = data.transactions || [];
 
-  if (txs.length === 0) {
-    list.innerHTML = "<li class='small-muted'>Aucune transaction pour ce compte.</li>";
+  list.innerHTML = "";
+
+  if(txs.length === 0){
+    list.innerHTML =
+      "<li class='small-muted'>Aucune transaction</li>";
     return;
   }
 
-  list.innerHTML = "";
-  txs.forEach(t => {
+  txs.forEach(t=>{
+
     const li = document.createElement("li");
+
     li.className = "history-item";
+
     li.innerHTML = `
       <div>
         <div class="history-main">${t.type}</div>
-        <div class="history-sub">${new Date(t.created_at).toLocaleString()}</div>
+        <div class="history-sub">
+          ${new Date(t.created_at).toLocaleString()}
+        </div>
       </div>
-      <div class="amount-badge">${Number(t.montant).toFixed(2)}€</div>
+      <div class="amount-badge">
+        ${Number(t.montant).toFixed(2)}€
+      </div>
     `;
+
     list.appendChild(li);
+
   });
+
 }
 
-document.getElementById("createBtn").addEventListener("click", async () => {
-  const type = document.getElementById("newType").value;
-  const msg = document.getElementById("msgCreate");
 
-  const { res, data } = await api("/api/accounts", "POST", { type });
-  if (res.ok) {
-    setMsg(msg, true, "Compte créé");
-    loadAccounts();
-  } else {
-    setMsg(msg, false, data.error || "Erreur");
-  }
-});
+/* ===============================
+   OPERATIONS
+================================ */
 
-document.getElementById("depositBtn").addEventListener("click", async () => {
-  const accountId = Number(document.getElementById("opAccountId").value);
-  const amount = Number(document.getElementById("opAmount").value);
-  const msg = document.getElementById("msgOp");
+document.getElementById("depositBtn")
+.addEventListener("click", async ()=>{
 
-  const { res, data } = await api("/api/transactions/deposit", "POST", { accountId, amount });
-  if (res.ok) {
-    setMsg(msg, true, "Dépôt OK");
+  const accountId =
+    Number(document.getElementById("opAccountId").value);
+
+  const amount =
+    Number(document.getElementById("opAmount").value);
+
+  const {res,data} =
+    await api("/api/transactions/deposit","POST",
+      {accountId,amount});
+
+  if(res.ok){
     loadAccounts();
     loadTransactions(accountId);
-  } else {
-    setMsg(msg, false, data.error || "Erreur");
+  }else{
+    alert(data.error || "Erreur");
   }
+
 });
 
-document.getElementById("withdrawBtn").addEventListener("click", async () => {
-  const accountId = Number(document.getElementById("opAccountId").value);
-  const amount = Number(document.getElementById("opAmount").value);
-  const msg = document.getElementById("msgOp");
 
-  const { res, data } = await api("/api/transactions/withdraw", "POST", { accountId, amount });
-  if (res.ok) {
-    setMsg(msg, true, "Retrait OK");
+document.getElementById("withdrawBtn")
+.addEventListener("click", async ()=>{
+
+  const accountId =
+    Number(document.getElementById("opAccountId").value);
+
+  const amount =
+    Number(document.getElementById("opAmount").value);
+
+  const {res,data} =
+    await api("/api/transactions/withdraw","POST",
+      {accountId,amount});
+
+  if(res.ok){
     loadAccounts();
     loadTransactions(accountId);
-  } else {
-    setMsg(msg, false, data.error || "Erreur");
+  }else{
+    alert(data.error || "Erreur");
   }
+
 });
 
-document.getElementById("transferBtn").addEventListener("click", async () => {
-  const fromAccountId = Number(document.getElementById("transferFrom").value);
-  const toIban = document.getElementById("transferIban").value.trim();
-  const amount = Number(document.getElementById("transferAmount").value);
-  const msg = document.getElementById("msgTransfer");
 
-  if (!fromAccountId || !toIban || !amount) {
-    setMsg(msg, false, "Remplis tous les champs du virement");
+document.getElementById("transferBtn")
+.addEventListener("click", async ()=>{
+
+  const fromAccountId =
+    Number(document.getElementById("transferFrom").value);
+
+  const toIban =
+    document.getElementById("transferIban").value.trim();
+
+  const amount =
+    Number(document.getElementById("transferAmount").value);
+
+  const {res,data} =
+    await api("/api/transactions/transfer","POST",
+      {fromAccountId,toIban,amount});
+
+  if(res.ok){
+    loadAccounts();
+    loadTransactions(fromAccountId);
+  }else{
+    alert(data.error || "Erreur");
+  }
+
+});
+
+
+/* ===============================
+   LOGOUT
+================================ */
+
+document.getElementById("logoutBtn")
+.addEventListener("click", async ()=>{
+
+  await api("/api/auth/logout","POST",{});
+
+  window.location.href = "/login.html";
+
+});
+
+
+/* ===============================
+   INIT
+================================ */
+
+(async()=>{
+
+  await loadCsrfToken();
+
+  const ok = await loadMe();
+
+  if(!ok){
+    window.location.href="/login.html";
     return;
   }
 
-  setMsg(msg, true, "Traitement...", "info");
-
-  const { res, data } = await api("/api/transactions/transfer", "POST", {
-    fromAccountId,
-    toIban,
-    amount
-  });
-
-  if (res.ok) {
-    setMsg(msg, true, "Virement effectué");
-    loadAccounts();
-    loadTransactions(fromAccountId);
-  } else {
-    setMsg(msg, false, data.error || "Erreur");
-  }
-});
-
-document.getElementById("logoutBtn").addEventListener("click", async () => {
-  await api("/api/auth/logout", "POST", {});
-  window.location.href = "/login.html";
-});
-
-(async () => {
-  await loadCsrfToken();
-  await loadMe();
   await loadAccounts();
-  updateSelectedAccountLabel(null);
+
 })();
 </script>
 

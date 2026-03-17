@@ -2,11 +2,16 @@ const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const db = require("../config/db");
 
+
+// ==============================
 // REGISTER
+// ==============================
 exports.register = async (req, res) => {
+
   try {
 
     const errors = validationResult(req);
+
     if (!errors.isEmpty()) {
       return res.status(400).json({
         error: errors.array()[0].msg
@@ -23,6 +28,7 @@ exports.register = async (req, res) => {
       password
     } = req.body;
 
+
     const [users] = await db.query(
       "SELECT id FROM users WHERE email = ?",
       [email]
@@ -34,17 +40,43 @@ exports.register = async (req, res) => {
       });
     }
 
+
     const hash = await bcrypt.hash(password, 10);
 
-    await db.query(
+    const [result] = await db.query(
       `INSERT INTO users
       (nom, prenom, email, telephone, adresse, date_naissance, password_hash, role, is_admin)
       VALUES (?, ?, ?, ?, ?, ?, ?, 'CLIENT', 0)`,
       [nom, prenom, email, telephone, adresse, date_naissance, hash]
     );
 
-    res.json({
-      message: "Inscription réussie"
+
+    // création session
+    req.session.user = {
+      id: result.insertId,
+      email,
+      nom,
+      prenom,
+      role: "CLIENT",
+      is_admin: 0
+    };
+
+
+    // 🔥 sauvegarde FORCÉE de la session
+    req.session.save((err) => {
+
+      if (err) {
+        console.error("SESSION SAVE ERROR:", err);
+        return res.status(500).json({
+          error: "Erreur session"
+        });
+      }
+
+      res.json({
+        message: "Inscription réussie",
+        user: req.session.user
+      });
+
     });
 
   } catch (err) {
@@ -56,10 +88,14 @@ exports.register = async (req, res) => {
     });
 
   }
+
 };
 
 
+
+// ==============================
 // LOGIN
+// ==============================
 exports.login = async (req, res) => {
 
   try {
@@ -79,7 +115,6 @@ exports.login = async (req, res) => {
 
     const user = users[0];
 
-    // correction ici : password_hash
     const match = await bcrypt.compare(password, user.password_hash);
 
     if (!match) {
@@ -87,6 +122,7 @@ exports.login = async (req, res) => {
         error: "Mot de passe incorrect"
       });
     }
+
 
     req.session.user = {
       id: user.id,
@@ -97,10 +133,21 @@ exports.login = async (req, res) => {
       is_admin: user.is_admin
     };
 
-    res.json({
-      message: "Connexion réussie",
-      user: req.session.user,
-      is_admin: user.is_admin
+
+    req.session.save((err) => {
+
+      if (err) {
+        console.error("SESSION SAVE ERROR:", err);
+        return res.status(500).json({
+          error: "Erreur session"
+        });
+      }
+
+      res.json({
+        message: "Connexion réussie",
+        user: req.session.user
+      });
+
     });
 
   } catch (err) {
@@ -116,7 +163,10 @@ exports.login = async (req, res) => {
 };
 
 
+
+// ==============================
 // ME
+// ==============================
 exports.me = (req, res) => {
 
   if (!req.session.user) {
@@ -132,15 +182,18 @@ exports.me = (req, res) => {
 };
 
 
+
+// ==============================
 // LOGOUT
+// ==============================
 exports.logout = (req, res) => {
 
   req.session.destroy(() => {
 
-    res.clearCookie("connect.sid");
+    res.clearCookie("irisbank.sid");
 
     res.json({
-      message: "Déconnecté"
+      message: "Déconnexion réussie"
     });
 
   });

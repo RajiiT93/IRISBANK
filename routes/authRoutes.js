@@ -4,10 +4,14 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
+
+// ========================================
 // REGISTER
+// ========================================
 router.post(
   "/register",
   [
+
     body("nom")
       .trim()
       .notEmpty()
@@ -51,15 +55,20 @@ router.post(
       .matches(/[A-Z]/)
       .withMessage("Mot de passe : 1 majuscule requise")
       .matches(/[0-9]/)
-      .withMessage("Mot de passe : 1 chiffre requis"),
+      .withMessage("Mot de passe : 1 chiffre requis")
+
   ],
   authController.register
 );
 
+
+// ========================================
 // LOGIN
+// ========================================
 router.post(
   "/login",
   [
+
     body("email")
       .isEmail()
       .withMessage("Email invalide")
@@ -69,15 +78,23 @@ router.post(
       .notEmpty()
       .withMessage("Mot de passe requis")
       .isLength({ min: 1, max: 100 })
-      .withMessage("Mot de passe invalide"),
+      .withMessage("Mot de passe invalide")
+
   ],
   authController.login
 );
 
-// SESSION USER
+
+// ========================================
+// USER SESSION
+// ========================================
 router.get("/me", authController.me);
 
+
+// ========================================
 // LOGOUT
+// ========================================
 router.post("/logout", authController.logout);
+
 
 module.exports = router;

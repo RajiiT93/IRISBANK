@@ -13,68 +13,128 @@ const authRoutes = require("./routes/authRoutes");
 const accountRoutes = require("./routes/accountRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const notificationRoutes = require("./routes/notificationRoutes"); // 🔥 AJOUT
 
 const app = express();
 
-// middlewares
+
+// ===============================
+// MIDDLEWARES
+// ===============================
+
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// session
+
+// ===============================
+// SESSION
+// ===============================
+
 app.use(
   session({
+    name: "irisbank.sid",
     secret: process.env.SESSION_SECRET || "irisbanksecret",
     resave: false,
     saveUninitialized: false,
+    rolling: true,
     cookie: {
-      httpOnly: true
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production", // 🔥 amélioration
+      maxAge: 1000 * 60 * 60
     }
   })
 );
 
-// rate limit login
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: { error: "Trop de tentatives de connexion" }
+
+// empêcher cache navigateur
+app.use((req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
 });
 
-// CSRF protection
+
+// ===============================
+// RATE LIMIT LOGIN
+// ===============================
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: "Trop de tentatives de connexion. Réessaie plus tard."
+  }
+});
+
+
+// ===============================
+// CSRF
+// ===============================
+
 const csrfProtection = csrf({
   cookie: true
 });
 
-// route pour récupérer le token CSRF
+
+// token CSRF
 app.get("/api/csrf-token", csrfProtection, (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
+  res.json({
+    csrfToken: req.csrfToken()
+  });
 });
 
-// ROUTES AUTH
-app.use("/api/auth/login", loginLimiter); // limiter login
-app.use("/api/auth", authRoutes); // auth sans csrf obligatoire
 
-// ROUTES PROTÉGÉES
+// ===============================
+// ROUTES AUTH (PAS DE CSRF)
+// ===============================
+
+app.use("/api/auth/login", loginLimiter);
+app.use("/api/auth", authRoutes);
+
+
+// ===============================
+// ROUTES PROTÉGÉES (AVEC CSRF)
+// ===============================
+
 app.use("/api/accounts", csrfProtection, accountRoutes);
 app.use("/api/transactions", csrfProtection, transactionRoutes);
 app.use("/api/admin", csrfProtection, adminRoutes);
 
-// gestion erreur CSRF
+// 🔥 ROUTE NOTIFICATIONS AJOUTÉE
+app.use("/api/notifications", csrfProtection, notificationRoutes);
+
+
+// ===============================
+// ERREUR CSRF
+// ===============================
+
 app.use((err, req, res, next) => {
+
   if (err.code === "EBADCSRFTOKEN") {
     return res.status(403).json({
       error: "Token CSRF invalide ou manquant"
     });
   }
 
-  console.error(err);
+  console.error("SERVER ERROR:", err);
+
   res.status(500).json({
     error: "Erreur serveur"
   });
+
 });
 
-// lancement serveur
-app.listen(3000, () => {
-  console.log("🚀 IRISBANK server running on port 3000");
+
+// ===============================
+// START SERVER
+// ===============================
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("🚀 IRISBANK server running on port " + PORT);
 });
