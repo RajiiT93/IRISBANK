@@ -1078,6 +1078,7 @@ select{
               <div class="actions">
                 <button id="depositBtn" class="btnx btn-primary" type="button">Dépôt</button>
                 <button id="withdrawBtn" class="btnx btn-danger2" type="button">Retrait</button>
+                 <button id="deleteAccountBtn" class="btnx btn-ghost2" type="button">Supprimer le compte</button>
               </div>
 
               <div class="form-note">Dépôt minimum : 1€ • Retrait minimum : 1€ • Retrait maximum : 1000€</div>
@@ -1471,6 +1472,39 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   await loadAccounts();
   updateSelectedAccountLabel(null);
 })();
+
+document.getElementById("deleteAccountBtn").addEventListener("click", async () => {
+  const accountId = Number(document.getElementById("opAccountId").value);
+  const msg = document.getElementById("msgOp");
+
+  if (!accountId) {
+    setMsg(msg, false, "Sélectionne un compte à supprimer");
+    return;
+  }
+
+  const confirmDelete = confirm(
+    "Voulez-vous vraiment supprimer ce compte ?\n\nAttention : le compte doit avoir un solde de 0 et ne pas être bloqué."
+  );
+
+  if (!confirmDelete) {
+    return;
+  }
+
+  const { res, data } = await api(`/api/accounts/${accountId}`, "DELETE");
+
+  if (res.ok) {
+    setMsg(msg, true, "Compte supprimé");
+    document.getElementById("opAccountId").value = "";
+    document.getElementById("transferFrom").value = "";
+    updateSelectedAccountLabel(null);
+    document.getElementById("transactions").innerHTML =
+      "<li class='small-muted'>Aucun compte sélectionné.</li>";
+    loadAccounts();
+  } else {
+    setMsg(msg, false, data.error || "Erreur lors de la suppression");
+  }
+});
+
 </script>
 
 </body>
